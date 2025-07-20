@@ -2,10 +2,10 @@ import React, { useRef, useEffect } from "react";
 import p5 from "p5"; // p5.js 라이브러리를 npm을 통해 임포트합니다.
 
 /**
- * RandomWalks 컴포넌트는 p5.js를 사용하여 랜덤 워커 스케치를 렌더링합니다.
+ * RandomNumberDistribution 컴포넌트는 p5.js를 사용하여 랜덤 숫자의 분포를 시각화하는 스케치를 렌더링합니다.
  * 이 컴포넌트는 p5.js 인스턴스를 관리하고, 스케치의 setup, draw 로직을 포함합니다.
  */
-function RandomWalks() {
+function RandomNumberDistribution() {
   // p5.js 캔버스가 렌더링될 DOM 요소를 참조하기 위한 ref를 생성합니다.
   const sketchRef = useRef(null);
 
@@ -14,27 +14,8 @@ function RandomWalks() {
 
     // p5.js 스케치 정의
     const sketch = (p) => {
-      let walker; // 워커 객체를 선언합니다.
-
-      // Walker 클래스 정의 (p5.js 스케치 내부에 포함)
-      class Walker {
-        constructor() {
-          this.x = p.width / 2; // p5.js의 width 변수를 사용합니다.
-          this.y = p.height / 2; // p5.js의 height 변수를 사용합니다.
-        }
-
-        show() {
-          p.stroke(0); // 검은색 선
-          p.point(this.x, this.y); // 현재 위치에 점을 그립니다.
-        }
-
-        step() {
-          let xstep = p.random(-1, 1); // -1에서 1 사이의 부동 소수점 값
-          let ystep = p.random(-1, 1); // -1에서 1 사이의 부동 소수점 값
-          this.x += xstep; // x 위치에 xstep을 더합니다.
-          this.y += ystep; // y 위치에 ystep을 더합니다.
-        }
-      }
+      let randomCounts = []; // 랜덤 숫자가 선택된 횟수를 추적하는 배열
+      let total = 20; // 배열의 총 길이 (랜덤 숫자의 범위)
 
       // setup 함수: 스케치가 시작될 때 한 번 실행됩니다.
       p.setup = () => {
@@ -45,20 +26,36 @@ function RandomWalks() {
           p.windowHeight * 0.6
         );
         canvas.parent(sketchRef.current); // 캔버스를 특정 DOM 요소에 연결
-        walker = new Walker(); // Walker 객체를 초기화합니다.
+        for (let i = 0; i < total; i++) {
+          randomCounts[i] = 0; // 배열의 모든 요소를 0으로 초기화합니다.
+        }
         p.background(255); // 배경을 흰색으로 설정합니다.
       };
 
       // draw 함수: 매 프레임마다 반복적으로 실행됩니다.
       p.draw = () => {
-        walker.step(); // 워커를 한 단계 이동시킵니다.
-        walker.show(); // 워커의 현재 위치에 점을 그립니다.
+        p.background(255); // 매 프레임마다 배경을 다시 그려 이전 그래프를 지웁니다.
+        const index = p.floor(p.random(total)); // 0부터 total-1 사이의 정수 인덱스를 무작위로 선택합니다.
+        randomCounts[index]++; // 해당 인덱스의 카운트를 증가시킵니다.
+
+        // 결과를 그래프로 그리기 위해 사각형을 그립니다.
+        p.stroke(0); // 검은색 선
+        p.strokeWeight(2); // 선의 두께
+        p.fill(127); // 회색 채우기
+
+        const w = p.width / randomCounts.length; // 각 막대의 너비
+
+        for (let x = 0; x < randomCounts.length; x++) {
+          // 각 막대를 그립니다. x 위치, y 위치 (캔버스 하단에서 위로), 너비, 높이
+          p.rect(x * w, p.height - randomCounts[x], w - 1, randomCounts[x]);
+        }
       };
 
       // 윈도우 크기가 변경될 때 캔버스 크기를 조정합니다.
       p.windowResized = () => {
         p.resizeCanvas(p.windowWidth * 0.8, p.windowHeight * 0.6);
         p.background(255); // 캔버스 크기 변경 시 배경을 다시 그려 기존 점들을 지웁니다.
+        // randomCounts 배열은 유지되므로 그래프는 계속 그려집니다.
       };
     };
 
@@ -96,4 +93,4 @@ function RandomWalks() {
   );
 }
 
-export default RandomWalks;
+export default RandomNumberDistribution;

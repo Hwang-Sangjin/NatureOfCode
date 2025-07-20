@@ -1,3 +1,4 @@
+import RandomNumberDistribution from "./p5/RandomNumberDistribution";
 import RandomWalks from "./p5/RandomWalks";
 import Scene from "./Scene";
 
@@ -6,6 +7,7 @@ const FiberContainer = () => {
     <>
       {/* <Scene /> */}
       <RandomWalks />
+      <RandomNumberDistribution />
     </>
   );
 };
